@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.vscode/
+ga_env_310/
+*.log
+test_images/
