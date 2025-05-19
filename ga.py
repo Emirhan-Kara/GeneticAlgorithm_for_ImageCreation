@@ -82,7 +82,7 @@ def get_min_and_max_fitness(population):
 
 if __name__ == "__main__":
     # Initialize the population
-    population = initialize_population(population_size=5)
+    population = initialize_population(population_size=3)
     image_path = "test_images/golden.jpg"  # Path to your image
     img = Image.open(image_path)
     chrom = Chromosome.Chromosome(img)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     # Evaluate the population
     # evaluation.evaluate_population_with_dynamic_penalty(population, 1)
     evaluation.evaluate_population_with_sharing_function(population)
-    elites = selection.select_elites(population)
+    M_t = selection.elitist_selection(population=population, generation_count=1)
 
     """# Get the min and max fitness
     max_fitness, min_fitness = get_min_and_max_fitness(population)

@@ -50,13 +50,17 @@ def spin_the_wheel(population, mating_pool_size=config.MATING_POOL_SIZE):
             
             # Find lower bound w_i of current individual
             if mid == 0:
-                lower_bound = 0                             # If mid = 0, then we are at the first individual. Its lower bound is of course 0
-            else:
-                lower_bound = population[mid-1].w_i         # Otherwise start at previous w_i
+                lower_bound = 0.0                           # If mid = 0, then we are at the first individual. Its lower bound is 0.0
+                upper_bound = population[mid].w_i
+            elif mid == len(population) - 1:                # If mid = len(population)-1, then we are at the last individual. Its upper bound is 1.0
+                lower_bound = population[mid-1].w_i
+                upper_bound = 1.0
+            else:                                           # Otherwise, the individual is between the edges. Its upper and lower bounds are normal
+                lower_bound = population[mid-1].w_i         
+                upper_bound = population[mid].w_i
             
             # If the random number is within the correct range, add the corresponding individual to the pool and break out from the binary search
-            # Edge case: if the individual is the first one, no need to control its lower bound since the random number can be 0 even if its very low chance
-            if (mid == 0 and r <= population[mid].w_i) or (lower_bound < r <= population[mid].w_i):
+            if lower_bound < r <= upper_bound:
                 mating_pool.append(population[mid])
                 break
             elif r <= lower_bound:      # Search left if the random number is smaller than the lower bound
@@ -115,7 +119,7 @@ def rank_selection(population, mating_pool_size=config.MATING_POOL_SIZE):
 
     # Assign ranks and cumulative probabilities for each individual
     for i, individual in enumerate(sorted_population):
-        individual.r_i = i
+        individual.r_i = i+1
         individual.w_i = individual.r_i / cumulative_sum_r
 
     mating_pool = spin_the_wheel(sorted_population, mating_pool_size)
@@ -123,14 +127,21 @@ def rank_selection(population, mating_pool_size=config.MATING_POOL_SIZE):
     return mating_pool
 
 def elitist_selection(population, generation_count, elite_count=config.ELITE_COUNT):
+    """
+        T.C. -> O(N * log N)        N=population size
+        S.C. -> O(N)                N=population size
+    """
     M_t = []
     
     if generation_count != 1:
-        elites = select_elites()
-        selections = rank_selection(population, mating_pool_size = config.POPULATION_SIZE-len(elites))
+        elites = select_elites(population, elite_count)
+        selections = rank_selection(population, mating_pool_size = len(population)-len(elites))
     else:
         elites = []
-        selections = rank_selection(population)
+        selections = rank_selection(population, mating_pool_size = len(population))
 
+    M_t = elites + selections
+
+    return M_t
     
-    
+
