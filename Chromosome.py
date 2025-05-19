@@ -18,7 +18,16 @@ class Chromosome:
     
         self.genes = gene_vector
         self.obj_function = self.calculate_obj_function()
-        self.fitness = 0.0
+        self.fitness = None
+
+        # For roulette wheel selection
+        self.p_i = None
+        self.w_i = None
+        # For rank selection
+        self.r_i = None
+
+    def __lt__(self, other):
+        return self.fitness < other.fitness
 
     def reconstruct_image(self):
         # Convert from float64 [0-1] to uint8 [0-255]

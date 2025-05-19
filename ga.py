@@ -6,6 +6,7 @@ import random
 import CNN
 from PIL import Image
 import evaluation
+import selection
 
 # Load the model
 config.MODEL = CNN.load_model()
@@ -61,9 +62,6 @@ def initialize_population(population_size=config.POPULATION_SIZE, image_size=con
     
     return population
 
-def tournament_selection():
-    return 1
-
 def get_min_and_max_fitness(population):
     """
         This function returns the min and max fitness of the population
@@ -84,7 +82,7 @@ def get_min_and_max_fitness(population):
 
 if __name__ == "__main__":
     # Initialize the population
-    population = initialize_population(population_size=48)
+    population = initialize_population(population_size=5)
     image_path = "test_images/golden.jpg"  # Path to your image
     img = Image.open(image_path)
     chrom = Chromosome.Chromosome(img)
@@ -98,7 +96,8 @@ if __name__ == "__main__":
     # Evaluate the population
     # evaluation.evaluate_population_with_dynamic_penalty(population, 1)
     evaluation.evaluate_population_with_sharing_function(population)
-    
+    elites = selection.select_elites(population)
+
     """# Get the min and max fitness
     max_fitness, min_fitness = get_min_and_max_fitness(population)
     print(f"Max fitness: {max_fitness}")
