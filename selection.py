@@ -132,19 +132,5 @@ def selection(population, mating_pool_size=config.MATING_POOL_SIZE, elite_count=
         T.C. -> O(N * log N)        N=population size
         S.C. -> O(N)                N=population size
     """
-    """M_t = []
-    
-    if generation_count != 1:
-        elites = select_elites(population, elite_count)
-        selections = rank_selection(population, mating_pool_size = len(population)-len(elites))
-    else:
-        elites = []
-        selections = rank_selection(population, mating_pool_size = len(population))
-
-    M_t = elites + selections"""
-
     M_t = roulette_wheel_selection(population, mating_pool_size)
-
     return M_t
-    
-

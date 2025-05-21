@@ -1,10 +1,10 @@
 import numpy as np
 
 # Image settings
-IMAGE_SIZE = 224
-CHANNEL_NUM = 3
+CANVAS_SIZE = 224  # Output image size
+POLYGON_COUNT = 50  # Number of triangles per individual
+POLYGON_PARAMS = 10  # Parameters per triangle: 6 for coordinates, 4 for RGBA
 SAVE_EVERY_N_GENERATIONS = 100
-RANDOM_IMAGE_CREATION_ITERATIONS = 100
 MODEL = None
 
 # Classification settings

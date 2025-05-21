@@ -38,8 +38,8 @@ def evaluate_population_with_dynamic_penalty(population, generation_counter=1):
 
 
 def calculate_sigma_share(n = None, q = None, x_upper = None, x_lower = None):
-    # Number of decision variables
-    n = config.IMAGE_SIZE * config.IMAGE_SIZE * config.CHANNEL_NUM
+    # Number of decision variables - now based on polygon representation
+    n = config.POLYGON_COUNT * config.POLYGON_PARAMS
 
     # For classification, each breed could represent a different optimum
     # For example fitness for dog class is calculated as the sum of 117 dog breeds
@@ -58,8 +58,8 @@ def calculate_euclidean_distance(chromosome1, chromosome2):
     """
         This function calculates the Euclidean distance between two chromosomes
 
-        T.C. -> O(n*n*m),   n=config.IMAGE_SIZE, m=config.CHANNEL_NUM
-        S.C. -> O(n*n*m),   n=config.IMAGE_SIZE, m=config.CHANNEL_NUM
+        T.C. -> O(n*p),   n=config.POLYGON_COUNT, p=config.POLYGON_PARAMS
+        S.C. -> O(n*p),   n=config.POLYGON_COUNT, p=config.POLYGON_PARAMS
     """
     # Flatten the genes of both chromosomes and calculate the Euclidean distance
     return np.sqrt(np.sum(pow((chromosome1.genes.flatten() - chromosome2.genes.flatten()), 2)))
@@ -102,6 +102,3 @@ def evaluate_population_with_sharing_function(population):
     for i in range(len(population)):
         chrom = population[i]
         chrom.fitness = chrom.obj_function / niche_counts[i]
-        
-
-    

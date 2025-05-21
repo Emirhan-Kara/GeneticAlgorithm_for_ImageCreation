@@ -1,4 +1,3 @@
-
 import numpy as np
 import random
 import config
@@ -19,38 +18,37 @@ def sbx_crossover(parent1, parent2, eta=15):
     child1_genes = np.zeros_like(parent1.genes)
     child2_genes = np.zeros_like(parent2.genes)
     
-    # Create the childen for each decvision variable (each pixel)
-    for i in range(parent1.genes.shape[0]):
-        for j in range(parent1.genes.shape[1]):
-            for d in range(parent1.genes.shape[2]):
-                # Get parent gene values
-                p1 = parent1.genes[i, j, d]
-                p2 = parent2.genes[i, j, d]
-                
-                # If parents are identical, children are identical to parents
-                if abs(p1 - p2) < 1e-10:
-                    child1_genes[i, j, d] = p1
-                    child2_genes[i, j, d] = p2
-                    continue
-                
-                # Ensure p1 <= p2
-                if p1 > p2:
-                    p1, p2 = p2, p1
-                
-                # Calculate beta
-                k = random.random()
-                if k <= 0.5:
-                    beta = (2.0 * k) ** (1.0 / (eta + 1.0))
-                else:
-                    beta = (1.0 / (2.0 * (1.0 - k))) ** (1.0 / (eta + 1.0))
-                
-                # Create children
-                child1_genes[i, j, d] = 0.5 * ((p1 + p2) - (beta * (p2 - p1)))
-                child2_genes[i, j, d] = 0.5 * ((p1 + p2) + (beta * (p2 - p1)))
-                
-                # Bound check
-                child1_genes[i, j, d] = max(min(child1_genes[i, j, d], 1.0), 0.0)
-                child2_genes[i, j, d] = max(min(child2_genes[i, j, d], 1.0), 0.0)
+    # Create the childen for each polygon and its parameters
+    for i in range(parent1.genes.shape[0]):  # For each polygon
+        for j in range(parent1.genes.shape[1]):  # For each parameter
+            # Get parent gene values
+            p1 = parent1.genes[i, j]
+            p2 = parent2.genes[i, j]
+            
+            # If parents are identical, children are identical to parents
+            if abs(p1 - p2) < 1e-10:
+                child1_genes[i, j] = p1
+                child2_genes[i, j] = p2
+                continue
+            
+            # Ensure p1 <= p2
+            if p1 > p2:
+                p1, p2 = p2, p1
+            
+            # Calculate beta
+            k = random.random()
+            if k <= 0.5:
+                beta = (2.0 * k) ** (1.0 / (eta + 1.0))
+            else:
+                beta = (1.0 / (2.0 * (1.0 - k))) ** (1.0 / (eta + 1.0))
+            
+            # Create children
+            child1_genes[i, j] = 0.5 * ((p1 + p2) - (beta * (p2 - p1)))
+            child2_genes[i, j] = 0.5 * ((p1 + p2) + (beta * (p2 - p1)))
+            
+            # Bound check
+            child1_genes[i, j] = max(min(child1_genes[i, j], 1.0), 0.0)
+            child2_genes[i, j] = max(min(child2_genes[i, j], 1.0), 0.0)
     
     # Create and return child chromosomes
     child1 = Chromosome.Chromosome(child1_genes)
@@ -58,23 +56,27 @@ def sbx_crossover(parent1, parent2, eta=15):
     
     return child1, child2
 
-def modified_random_mutation(chromosome, mutation_rate=config.MUTATION_RATE, delta=2):
+def modified_random_mutation(chromosome, mutation_rate=config.MUTATION_RATE, delta=0.2):
     # Apply mutation to each gene with probability mutation_rate
-    for i in range(chromosome.genes.shape[0]):
-        for j in range(chromosome.genes.shape[1]):
-            for d in range(chromosome.genes.shape[2]):
-                if random.random() < mutation_rate:
-                    r = random.random()
-                    y = chromosome.genes[i, j, d] + (delta * (r - 0.5))
-                    y = max(min(y, 1.0), 0.0)
-                    chromosome.genes[i, j, d] = y
+    for i in range(chromosome.genes.shape[0]):  # For each polygon
+        for j in range(chromosome.genes.shape[1]):  # For each parameter
+            if random.random() < mutation_rate:
+                r = random.random()
+                y = chromosome.genes[i, j] + (delta * (r - 0.5))
+                y = max(min(y, 1.0), 0.0)
+                chromosome.genes[i, j] = y
+                
+                # Special handling for alpha channel - keep it semi-transparent
+                if j == 9:  # Alpha parameter
+                    chromosome.genes[i, j] = min(chromosome.genes[i, j], 0.7)  # Limit max alpha
 
 def crossover_and_mutation(parent1, parent2, crossover_rate=config.CROSSOVER_RATE, mutation_rate=config.MUTATION_RATE):
-
     if random.random() < crossover_rate:
         child1, child2 = sbx_crossover(parent1, parent2)
     else:
-        child1, child2 = parent1, parent2
+        # Create deep copies to avoid modifying parents
+        child1 = Chromosome.Chromosome(np.copy(parent1.genes))
+        child2 = Chromosome.Chromosome(np.copy(parent2.genes))
 
     modified_random_mutation(child1, mutation_rate)
     modified_random_mutation(child2, mutation_rate)
