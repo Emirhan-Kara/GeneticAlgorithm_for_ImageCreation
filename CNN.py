@@ -50,9 +50,9 @@ def display_results(model, img_path, class_indices):
     print(f"Dog probability: {total_score:.4f}")
     plt.show()
 
-# Main execution
+"""# Main execution
 if __name__ == "__main__":
     model = load_model()
     display_results(model, IMAGE_PATH, class_indices=TARGET_INDICES)
     total_score = classify_image(model, IMAGE_PATH, class_indices=TARGET_INDICES)
-    print(f"\nDog probability: {total_score:.4f}")
+    print(f"\nDog probability: {total_score:.4f}")"""

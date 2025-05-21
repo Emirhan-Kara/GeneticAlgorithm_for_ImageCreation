@@ -121,17 +121,18 @@ def rank_selection(population, mating_pool_size=config.MATING_POOL_SIZE):
     for i, individual in enumerate(sorted_population):
         individual.r_i = i+1
         individual.w_i = individual.r_i / cumulative_sum_r
+        individual.w_i += i / cumulative_sum_r
 
     mating_pool = spin_the_wheel(sorted_population, mating_pool_size)
 
     return mating_pool
 
-def elitist_selection(population, generation_count, elite_count=config.ELITE_COUNT):
+def selection(population, mating_pool_size=config.MATING_POOL_SIZE, elite_count=config.ELITE_COUNT):
     """
         T.C. -> O(N * log N)        N=population size
         S.C. -> O(N)                N=population size
     """
-    M_t = []
+    """M_t = []
     
     if generation_count != 1:
         elites = select_elites(population, elite_count)
@@ -140,7 +141,9 @@ def elitist_selection(population, generation_count, elite_count=config.ELITE_COU
         elites = []
         selections = rank_selection(population, mating_pool_size = len(population))
 
-    M_t = elites + selections
+    M_t = elites + selections"""
+
+    M_t = roulette_wheel_selection(population, mating_pool_size)
 
     return M_t
     

@@ -50,7 +50,7 @@ def calculate_sigma_share(n = None, q = None, x_upper = None, x_lower = None):
     x_upper = 1.0
     x_lower = 0.0
 
-    sigma_share = (np.sqrt(n * ((x_upper - x_lower)**2))) / (q ** (1 / (2**n)))
+    sigma_share = (np.sqrt(n * ((x_upper - x_lower)**2.0))) / (2 * (q ** (1.0 / n)))
 
     return sigma_share
 
@@ -73,8 +73,8 @@ def Sh(d, sigma_share, alpha=1):
     """
     # Calculate the sharing function
     if d <= sigma_share:
-        return 1 - pow((d / sigma_share), alpha)
-    return 0
+        return 1.0 - pow((d / sigma_share), alpha)
+    return 0.0
 
 def evaluate_population_with_sharing_function(population):
     sigma_share = calculate_sigma_share()

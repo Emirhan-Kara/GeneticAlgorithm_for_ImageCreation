@@ -7,6 +7,8 @@ import CNN
 from PIL import Image
 import evaluation
 import selection
+import variation
+import survivor
 
 # Load the model
 config.MODEL = CNN.load_model()
@@ -81,9 +83,14 @@ def get_min_and_max_fitness(population):
     return max_fitness, min_fitness
 
 if __name__ == "__main__":
+    population_size = config.POPULATION_SIZE
+    elite_count = config.ELITE_COUNT
+    mating_pool_size = config.MATING_POOL_SIZE
+
+    #population = []
     # Initialize the population
-    population = initialize_population(population_size=3)
-    image_path = "test_images/golden.jpg"  # Path to your image
+    population = initialize_population(population_size)
+    """image_path = "test_images/golden.jpg"  # Path to your image
     img = Image.open(image_path)
     chrom = Chromosome.Chromosome(img)
     population.append(chrom)
@@ -91,12 +98,30 @@ if __name__ == "__main__":
     image_path = "test_images/dog.jpg"  # Path to your image
     img = Image.open(image_path)
     chrom = Chromosome.Chromosome(img)
-    population.append(chrom)
+    population.append(chrom)"""
 
     # Evaluate the population
-    # evaluation.evaluate_population_with_dynamic_penalty(population, 1)
+    elites = []
     evaluation.evaluate_population_with_sharing_function(population)
-    M_t = selection.elitist_selection(population=population, generation_count=1)
+    for i in range(1, config.NUM_OF_GENERATIONS+1):
+        print(f"Generation no: {i+1}\n")
+
+        """# Get the elites if its not the first generation
+        if i != 1:
+            elites = selection.select_elites(population, elite_count)"""
+        print("Selection stage...")
+        M_t = selection.selection(population, mating_pool_size, elite_count)
+        print("Variation stage...")
+        Q_t = variation.variation(M_t, config.CROSSOVER_RATE, config.MUTATION_RATE)
+        R_t = Q_t + elites
+        print("Evaluation stage...")
+        evaluation.evaluate_population_with_sharing_function(R_t)
+
+        print("Survivor stage...")
+        population = survivor.elitest_survivor(R_t, population_size)
+        elites = selection.select_elites(population, elite_count)
+        print("===========================================")
+
 
     """# Get the min and max fitness
     max_fitness, min_fitness = get_min_and_max_fitness(population)
@@ -106,12 +131,5 @@ if __name__ == "__main__":
     for chrom in population:
         print(f"Chromosome fitness: {chrom.fitness}")
         print(f"Chromosome objective function: {chrom.obj_function}\n")"""
-
-
-    """for i in range(config.NUM_OF_GENERATIONS):
-        print(f"Generation no: {i}\n")"""
-
-
-
 
 
